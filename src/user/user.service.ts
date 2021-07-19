@@ -21,13 +21,12 @@ export class UserService {
             this.logger.error('Phone or Captcha is error')
         }
 
-        const userName = randomInt(Number(body.phone))
         let user = await this.userEntity.create({
             phone: body.phone,
             password: body.password,
-            name: userName
         })
-        await this.userEntity.save(user)
+        const userName = randomInt(Number(user.id))
+        await this.userEntity.save({ ...user, name: userName})
         return user
     }
 
