@@ -1,39 +1,40 @@
-import {Observable} from 'rxjs'
-import {map} from 'rxjs/operators'
-import {NestInterceptor, ExecutionContext, CallHandler, Injectable} from '@nestjs/common'
-
-export interface IResponse<T> {
-    code: number
-    message?: string
-    result: T
-}
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
+import { Request, Response } from 'express'
+import { ParsedUrlQueryInput, stringify } from 'querystring'
+import { isEmpty } from 'lodash'
 
 @Injectable()
-export class LoggerInterceptor<T> implements NestInterceptor<T, IResponse<T>> {
+export class LoggerInterceptor implements NestInterceptor {
+  private logger = new Logger(LoggerInterceptor.name)
 
-    intercept(
-        context: ExecutionContext,
-        next: CallHandler<T>,
-    ): Observable<IResponse<T>> | Promise<Observable<IResponse<T>>> {
-        const httpContext = context.switchToHttp();
-        const req = httpContext.getRequest<Request>();
-        const res = httpContext.getResponse();
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+    const httpContext = context.switchToHttp()
+    const req = httpContext.getRequest<Request>()
+    const res = httpContext.getResponse<Response>()
 
-        return next.handle().pipe(
-            map((data) => {
-                if (req.headers["range"]) {
-                    let pageResult = req.headers['range'].split('=')[1] || '';
-                    res.set('Access-Control-Expose-Headers', 'Content-Range');
-                    res.set({"Content-Range": `items ${pageResult}/${data['totalCount'] ? data['totalCount'] : '*'}`});
+    const queryStr = isEmpty(req.query) ? '' : `?${stringify(req.query as ParsedUrlQueryInput)}`
 
-                    data = data['list'] || []
-                }
-                return {
-                    code: 0,
-                    message: 'ok',
-                    result: data,
-                }
-            }),
+    this.logger.log(
+      `${req.method} ${req.path}${queryStr} ${JSON.stringify({
+        ip: req.ip,
+        header: req.headers,
+        body: req.body,
+      })}`,
+      '<--',
+    )
+
+    return next.handle().pipe(
+      tap((data) => {
+        this.logger.log(
+          `${req.method} ${req.path}${queryStr} ${res.statusCode} ${JSON.stringify({
+            header: res.header,
+            return: data,
+          })}`,
+          '-->',
         )
-    }
+      }),
+    )
+  }
 }

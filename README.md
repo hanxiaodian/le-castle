@@ -29,7 +29,7 @@
 ## Installation
 
 ```bash
-$ npm install
+$ yarn install
 ```
 
 ## Running the app
@@ -37,37 +37,18 @@ $ npm install
 ```bash
 # development
 $ npm run start
+or
+$ nest start
 
 # watch mode
 $ npm run start:dev
+or
+$ nest start -w
 
-# production mode
-$ npm run start:prod
-```
+DB: PostgreSQL
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+部署：
+  1.使用 pm2 部署
+    pm2 start process.json
+    配置了cluster模式，可以自定义instances，实例个数，pm2可以自动实现负载均衡
+  2.使用Docker+Kubernetes

@@ -1,0 +1,17 @@
+[
+    {
+        "name": "le-castle",
+        "script": "./src/run.js",
+        "exec_mode": "cluster_mode",
+        "instances": 3,
+        "merge_logs": true,
+        "watch": false,
+        "error_file":"./logs/err.log",
+        "out_file":"./logs/out.log",
+        "env": {
+            "NODE_PORT": 3000,
+            "NODE_ENV": "development"
+        }
+    }
+  ]
+  
