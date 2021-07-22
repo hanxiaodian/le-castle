@@ -19,3 +19,12 @@ export default function randomInt (value: number) { // value在[-(2 ** 32 - 1), 
     const result = ((r1 << 16) + l1)
     return result
 }
+
+// plan B
+export function randomIntName (value: number) {
+    const unixTimestamp = Date.now()
+    const randomInt = Math.floor(20 * (Math.random()))
+
+    const result = Number(unixTimestamp + value + `${randomInt}`)
+    return result
+}
